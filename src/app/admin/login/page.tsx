@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, ShieldAlert, Award, ArrowLeft } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -53,7 +53,11 @@ export default function AdminLoginPage() {
 
         <div className="bg-white rounded-xl p-8 border border-[#E2E7EF] space-y-6">
           <div className="text-center space-y-2">
-            <Award className="w-10 h-10 text-[#155EEF] mx-auto" />
+            <img
+              src="/logo.png"
+              alt="Prêmio UNEB Excelência em Gestão"
+              className="h-16 w-16 object-contain mx-auto"
+            />
             <h1 className="text-2xl font-bold text-[#172033]">Painel Administrativo</h1>
             <p className="text-xs text-[#667085]">
               Acesso restrito aos gestores e avaliadores do Prêmio UNEB Excelência em Gestão

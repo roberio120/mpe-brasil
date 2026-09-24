@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { SubmissionRecord } from '@/types/mpe';
 import { SECTOR_CATEGORIES, BRAZILIAN_STATES } from '@/lib/data/mpeQuestionnaire';
 import {
-  Award,
   LogOut,
   ShieldCheck,
   Search,
@@ -150,7 +149,11 @@ export default function AdminDashboardPage() {
       <header className="bg-white border-b border-[#E2E7EF] h-16 sm:h-20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Award className="w-6 h-6 text-[#155EEF]" />
+            <img
+              src="/logo.png"
+              alt="Prêmio UNEB Excelência em Gestão"
+              className="h-9 w-9 object-contain"
+            />
             <div>
               <span className="font-extrabold text-base text-[#172033]">
                 Prêmio UNEB Excelência em Gestão

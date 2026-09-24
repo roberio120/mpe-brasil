@@ -7,7 +7,6 @@ import CompanyRegistrationStep from '@/components/public/CompanyRegistrationStep
 import QuestionnaireWizard from '@/components/public/QuestionnaireWizard';
 import ThankYouScreen from '@/components/public/ThankYouScreen';
 import {
-  Award,
   ShieldCheck,
   Clock,
   Lock,
@@ -130,7 +129,11 @@ export default function PublicHomePage() {
       <header className="bg-white border-b border-[#E2E7EF] h-16 sm:h-20 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Award className="w-6 h-6 text-[#155EEF]" />
+            <img
+              src="/logo.png"
+              alt="Prêmio UNEB Excelência em Gestão"
+              className="h-9 w-9 object-contain"
+            />
             <div>
               <span className="font-extrabold text-base text-[#172033]">
                 Prêmio UNEB Excelência em Gestão
@@ -281,6 +284,11 @@ export default function PublicHomePage() {
       {/* Footer */}
       <footer className="bg-white border-t border-[#E2E7EF] py-6 mt-auto">
         <div className="max-w-6xl mx-auto px-4 text-center text-xs text-[#667085] space-y-1">
+          <img
+            src="/logo.png"
+            alt="Prêmio UNEB Excelência em Gestão"
+            className="h-8 w-8 object-contain mx-auto mb-1"
+          />
           <p className="font-semibold text-[#172033]">Prêmio UNEB Excelência em Gestão • Autoavaliação de Gestão</p>
           <p>MEG 19ª Ed. • Política de Privacidade • Termos de Uso em conformidade com a LGPD</p>
         </div>
