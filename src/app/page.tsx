@@ -133,7 +133,7 @@ export default function PublicHomePage() {
             <Award className="w-6 h-6 text-[#155EEF]" />
             <div>
               <span className="font-extrabold text-base text-[#172033]">
-                MPE Brasil
+                Prêmio UNEB Excelência em Gestão
               </span>
               <span className="hidden sm:inline text-xs text-[#667085] ml-2">
                 Autoavaliação de Gestão • MEG 19ª Ed.
@@ -281,7 +281,7 @@ export default function PublicHomePage() {
       {/* Footer */}
       <footer className="bg-white border-t border-[#E2E7EF] py-6 mt-auto">
         <div className="max-w-6xl mx-auto px-4 text-center text-xs text-[#667085] space-y-1">
-          <p className="font-semibold text-[#172033]">MPE Brasil • Autoavaliação de Gestão</p>
+          <p className="font-semibold text-[#172033]">Prêmio UNEB Excelência em Gestão • Autoavaliação de Gestão</p>
           <p>MEG 19ª Ed. • Política de Privacidade • Termos de Uso em conformidade com a LGPD</p>
         </div>
       </footer>

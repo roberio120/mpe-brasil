@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
-      'Content-Disposition': `attachment; filename="backup_mpe_brasil_${timestamp}.json"`,
+      'Content-Disposition': `attachment; filename="backup_premio_uneb_${timestamp}.json"`,
     },
   });
 }

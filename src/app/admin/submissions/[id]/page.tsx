@@ -160,7 +160,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[#E2E7EF]">
             <div>
               <span className="text-xs font-bold text-[#155EEF] uppercase tracking-wider block mb-1">
-                Diagnóstico Oficial MPE Brasil (MEG® 19ª Ed.)
+                Diagnóstico Oficial do Prêmio UNEB Excelência em Gestão (MEG® 19ª Ed.)
               </span>
               <h1 className="text-2xl font-bold text-[#172033]">
                 {submission.companyInfo.companyName}

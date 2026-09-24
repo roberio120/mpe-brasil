@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
             <Award className="w-10 h-10 text-[#155EEF] mx-auto" />
             <h1 className="text-2xl font-bold text-[#172033]">Painel Administrativo</h1>
             <p className="text-xs text-[#667085]">
-              Acesso restrito aos gestores e avaliadores do MPE Brasil
+              Acesso restrito aos gestores e avaliadores do Prêmio UNEB Excelência em Gestão
             </p>
           </div>
 

@@ -349,7 +349,7 @@ export default function QuestionnaireWizard({
           <div className="p-4 bg-[#F7F9FC] rounded-lg border border-[#E2E7EF] space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-[#172033]">
               <Calculator className="w-4 h-4 text-[#155EEF]" />
-              Calculadora de Margem de Lucro MPE Brasil
+              Prêmio UNEB Excelência em Gestão · Calculadora de Margem de Lucro
             </div>
             <p className="text-xs text-[#667085]">
               Fórmula MPE: Margem (%) = &#123;[Receita Bruta - (Custos + Despesas Totais)] ÷ Receita Bruta&#125; × 100

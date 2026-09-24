@@ -58,7 +58,7 @@ export default function LgpdConsentModal({ isOpen, onAccept, onClose }: Props) {
           </div>
 
           <p className="text-sm text-[#667085]">
-            Ao prosseguir e preencher este Questionário de Autoavaliação MPE Brasil (baseado no Modelo de Excelência da Gestão® - MEG 19ª Ed.), você concorda com o tratamento dos dados pessoais e empresariais fornecidos, sob as seguintes condições:
+            Ao prosseguir e preencher este Questionário de Autoavaliação do Prêmio UNEB Excelência em Gestão (baseado no Modelo de Excelência da Gestão® - MEG 19ª Ed.), você concorda com o tratamento dos dados pessoais e empresariais fornecidos, sob as seguintes condições:
           </p>
 
           <ol className="list-decimal pl-5 space-y-3 text-sm text-[#172033]">

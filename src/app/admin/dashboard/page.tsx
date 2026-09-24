@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
             <Award className="w-6 h-6 text-[#155EEF]" />
             <div>
               <span className="font-extrabold text-base text-[#172033]">
-                Painel Administrador MPE Brasil
+                Prêmio UNEB Excelência em Gestão
               </span>
               <span className="hidden md:inline text-xs text-[#667085] ml-3 border-l border-[#E2E7EF] pl-3">
                 Diagnósticos MEG 19ª Edição
