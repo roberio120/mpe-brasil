@@ -111,7 +111,7 @@ export default function AdminLoginPage() {
               disabled={isLoading}
               className="w-full h-12 bg-[#155EEF] hover:bg-[#0F3D91] text-white font-semibold text-sm rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              {isLoading ? 'Autenticando...' : 'Entrar no Painel Protegido'}
+              {isLoading ? 'Autenticando...' : 'Entrar no Painel'}
             </button>
           </form>
         </div>
