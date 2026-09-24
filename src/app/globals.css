@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #F7F9FC;
+  --surface: #FFFFFF;
+  --border: #E2E7EF;
+  --border-input: #D0D5DD;
+  --text: #172033;
+  --text-secondary: #667085;
+  --placeholder: #667085;
+  --primary: #155EEF;
+  --primary-dark: #0F3D91;
+  --primary-soft: #EFF6FF;
+  --success: #12B76A;
+  --error: #D92D20;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::placeholder {
+  color: var(--placeholder) !important;
+  opacity: 1;
+}
+
+/* Custom Focus Ring Utility */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
