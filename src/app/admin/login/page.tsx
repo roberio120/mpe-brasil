@@ -106,14 +106,6 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-[#F7F9FC] border border-[#E2E7EF] rounded-lg text-[11px] text-[#667085] space-y-1">
-              <div className="font-bold text-[#172033] flex items-center gap-1">
-                <Lock className="w-3 h-3 text-[#155EEF]" /> Credenciais de Teste Padrão:
-              </div>
-              <p>E-mail: <code className="bg-white px-1 rounded border border-[#E2E7EF] font-mono text-[#172033]">admin@mpebrasil.com.br</code></p>
-              <p>Senha: <code className="bg-white px-1 rounded border border-[#E2E7EF] font-mono text-[#172033]">Admin123!@#</code></p>
-            </div>
-
             <button
               type="submit"
               disabled={isLoading}
