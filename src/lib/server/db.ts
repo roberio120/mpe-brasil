@@ -1,97 +1,67 @@
-import fs from 'fs';
-import path from 'path';
-import bcrypt from 'bcryptjs';
-import { SubmissionRecord, AdminUser } from '@/types/mpe';
+import { PrismaClient } from '@prisma/client';
+import { SubmissionRecord, AdminUser, CompanyInfo } from '@/types/mpe';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'db.json');
+const prisma = new PrismaClient();
 
-interface DbSchema {
-  admins: (AdminUser & { passwordHash: string })[];
-  submissions: SubmissionRecord[];
+type SubmissionRow = Awaited<ReturnType<typeof prisma.submission.findFirst>>;
+
+function rowToRecord(row: SubmissionRow): SubmissionRecord {
+  if (!row || !row.recordJson) {
+    throw new Error(`Submission ${row?.id} sem recordJson`);
+  }
+  return JSON.parse(row.recordJson) as SubmissionRecord;
 }
 
-// Initial Admin User Credentials
-const DEFAULT_ADMIN_EMAIL = 'admin@mpebrasil.com.br';
-const DEFAULT_ADMIN_PASS = 'Admin123!@#';
-
-function ensureDataFile(): DbSchema {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-
-  if (!fs.existsSync(DB_FILE)) {
-    const salt = bcrypt.genSaltSync(10);
-    const passwordHash = bcrypt.hashSync(DEFAULT_ADMIN_PASS, salt);
-
-    const initialData: DbSchema = {
-      admins: [
-        {
-          id: 'admin-1',
-          email: DEFAULT_ADMIN_EMAIL,
-          name: 'Administrador MPE Brasil',
-          role: 'superadmin',
-          twoFactorEnabled: false,
-          passwordHash,
-        },
-      ],
-      submissions: [],
-    };
-
-    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
-    return initialData;
-  }
-
-  try {
-    const content = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(content) as DbSchema;
-  } catch (error) {
-    console.error('Error reading db file, re-initializing:', error);
-    const salt = bcrypt.genSaltSync(10);
-    const passwordHash = bcrypt.hashSync(DEFAULT_ADMIN_PASS, salt);
-    const initialData: DbSchema = {
-      admins: [
-        {
-          id: 'admin-1',
-          email: DEFAULT_ADMIN_EMAIL,
-          name: 'Administrador MPE Brasil',
-          role: 'superadmin',
-          twoFactorEnabled: false,
-          passwordHash,
-        },
-      ],
-      submissions: [],
-    };
-    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
-    return initialData;
-  }
-}
-
-function writeDb(data: DbSchema): void {
-  ensureDataFile();
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-export async function getAdminByEmail(email: string) {
-  const db = ensureDataFile();
-  return db.admins.find((a) => a.email.toLowerCase() === email.toLowerCase());
+export async function getAdminByEmail(
+  email: string
+): Promise<(AdminUser & { passwordHash: string }) | null> {
+  const admin = await prisma.adminUser.findFirst({
+    where: { email: { equals: email, mode: 'insensitive' } },
+  });
+  if (!admin) return null;
+  return admin as AdminUser & { passwordHash: string };
 }
 
 export async function toggleAdmin2FA(email: string): Promise<boolean> {
-  const db = ensureDataFile();
-  const admin = db.admins.find((a) => a.email.toLowerCase() === email.toLowerCase());
-  if (admin) {
-    admin.twoFactorEnabled = !admin.twoFactorEnabled;
-    writeDb(db);
-    return admin.twoFactorEnabled;
-  }
-  return false;
+  const admin = await prisma.adminUser.findFirst({
+    where: { email: { equals: email, mode: 'insensitive' } },
+  });
+  if (!admin) return false;
+  const updated = await prisma.adminUser.update({
+    where: { id: admin.id },
+    data: { twoFactorEnabled: !admin.twoFactorEnabled },
+  });
+  return updated.twoFactorEnabled;
 }
 
 export async function saveSubmission(record: SubmissionRecord): Promise<void> {
-  const db = ensureDataFile();
-  db.submissions.unshift(record);
-  writeDb(db);
+  const { companyInfo } = record;
+  await prisma.submission.create({
+    data: {
+      id: record.id,
+      companyName: companyInfo.companyName,
+      tradeName: companyInfo.tradeName ?? null,
+      cnpj: companyInfo.cnpj,
+      contactName: companyInfo.contactName,
+      contactRole: companyInfo.contactRole,
+      email: companyInfo.email,
+      phone: companyInfo.phone,
+      sectorCategory: companyInfo.sectorCategory,
+      state: companyInfo.state,
+      city: companyInfo.city,
+      lgpdConsented: record.lgpdConsented,
+      lgpdConsentedAt: new Date(record.lgpdConsentedAt),
+      answersJson: JSON.stringify(record.answers),
+      scoreTotal: record.scoreTotal,
+      maxScoreTotal: record.maxScoreTotal,
+      scorePercentage: record.scorePercentage,
+      maturityLevel: record.maturityLevel,
+      diagnosticJson: JSON.stringify(record.diagnosticReport),
+      recordJson: JSON.stringify(record),
+      isAnonymized: record.isAnonymized,
+      submittedAt: new Date(record.submittedAt),
+    },
+  });
 }
 
 export async function getAllSubmissions(filters?: {
@@ -100,72 +70,79 @@ export async function getAllSubmissions(filters?: {
   state?: string;
   maturity?: string;
 }): Promise<SubmissionRecord[]> {
-  const db = ensureDataFile();
-  let list = [...db.submissions];
-
-  if (filters?.search) {
-    const s = filters.search.toLowerCase();
-    list = list.filter(
-      (sub) =>
-        sub.companyInfo.companyName.toLowerCase().includes(s) ||
-        sub.companyInfo.cnpj.includes(s) ||
-        sub.companyInfo.contactName.toLowerCase().includes(s) ||
-        sub.companyInfo.city.toLowerCase().includes(s)
-    );
-  }
-
-  if (filters?.sector) {
-    list = list.filter((sub) => sub.companyInfo.sectorCategory === filters.sector);
-  }
-
-  if (filters?.state) {
-    list = list.filter((sub) => sub.companyInfo.state === filters.state);
-  }
-
-  if (filters?.maturity) {
-    list = list.filter((sub) => sub.maturityLevel === filters.maturity);
-  }
-
-  return list;
+  const rows = await prisma.submission.findMany({
+    where: {
+      ...(filters?.search
+        ? {
+            OR: [
+              { companyName: { contains: filters.search, mode: 'insensitive' as const } },
+              { cnpj: { contains: filters.search } },
+              { contactName: { contains: filters.search, mode: 'insensitive' as const } },
+              { city: { contains: filters.search, mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+      ...(filters?.sector ? { sectorCategory: filters.sector } : {}),
+      ...(filters?.state ? { state: filters.state } : {}),
+      ...(filters?.maturity ? { maturityLevel: filters.maturity } : {}),
+    },
+    orderBy: { submittedAt: 'desc' },
+  });
+  return rows.map(rowToRecord);
 }
 
 export async function getSubmissionById(id: string): Promise<SubmissionRecord | null> {
-  const db = ensureDataFile();
-  return db.submissions.find((sub) => sub.id === id) || null;
+  const row = await prisma.submission.findUnique({ where: { id } });
+  if (!row) return null;
+  return rowToRecord(row);
 }
 
 export async function deleteSubmission(id: string): Promise<boolean> {
-  const db = ensureDataFile();
-  const index = db.submissions.findIndex((sub) => sub.id === id);
-  if (index !== -1) {
-    db.submissions.splice(index, 1);
-    writeDb(db);
+  try {
+    await prisma.submission.delete({ where: { id } });
     return true;
+  } catch {
+    return false;
   }
-  return false;
 }
 
 export async function anonymizeSubmission(id: string): Promise<boolean> {
-  const db = ensureDataFile();
-  const sub = db.submissions.find((s) => s.id === id);
-  if (sub) {
-    sub.isAnonymized = true;
-    sub.companyInfo.companyName = `Empresa Anonimizada #${id.slice(0, 6)}`;
-    sub.companyInfo.tradeName = 'Anonimizado LGPD';
-    sub.companyInfo.cnpj = '00.000.000/0000-00';
-    sub.companyInfo.contactName = 'Contato Anonimizado';
-    sub.companyInfo.email = 'anonimizado@lgpd.local';
-    sub.companyInfo.phone = '(00) 00000-0000';
-    sub.updatedAt = new Date().toISOString();
-    writeDb(db);
-    return true;
-  }
-  return false;
+  const row = await prisma.submission.findUnique({ where: { id } });
+  if (!row) return false;
+
+  const record = rowToRecord(row);
+  const updated = { ...record, updatedAt: new Date().toISOString() };
+  updated.isAnonymized = true;
+  updated.companyInfo = {
+    ...updated.companyInfo,
+    companyName: `Empresa Anonimizada #${id.slice(0, 6)}`,
+    tradeName: 'Anonimizado LGPD',
+    cnpj: '00.000.000/0000-00',
+    contactName: 'Contato Anonimizado',
+    email: 'anonimizado@lgpd.local',
+    phone: '(00) 00000-0000',
+  } as CompanyInfo;
+
+  await prisma.submission.update({
+    where: { id },
+    data: {
+      companyName: updated.companyInfo.companyName,
+      tradeName: 'Anonimizado LGPD',
+      cnpj: '00.000.000/0000-00',
+      contactName: 'Contato Anonimizado',
+      email: 'anonimizado@lgpd.local',
+      phone: '(00) 00000-0000',
+      isAnonymized: true,
+      recordJson: JSON.stringify(updated),
+      updatedAt: new Date(updated.updatedAt),
+    },
+  });
+
+  return true;
 }
 
 export async function getDashboardStats() {
-  const db = ensureDataFile();
-  const subs = db.submissions;
+  const subs = await getAllSubmissions();
 
   const totalSubmissions = subs.length;
   if (totalSubmissions === 0) {
@@ -219,17 +196,14 @@ export async function getDashboardStats() {
   };
 
   subs.forEach((sub) => {
-    // Maturity
     const mat = sub.maturityLevel as keyof typeof maturityDistribution;
     if (maturityDistribution[mat] !== undefined) {
       maturityDistribution[mat]++;
     }
 
-    // Sector
     const sec = sub.companyInfo.sectorCategory;
     sectorCounts[sec] = (sectorCounts[sec] || 0) + 1;
 
-    // Criteria averages
     if (sub.diagnosticReport && sub.diagnosticReport.dimensions) {
       Object.keys(criteriaSums).forEach((k) => {
         const key = k as keyof typeof criteriaSums;
@@ -241,7 +215,6 @@ export async function getDashboardStats() {
     }
   });
 
-  // Top Sector
   let topSector = 'N/A';
   let maxSectorCount = 0;
   Object.entries(sectorCounts).forEach(([sec, count]) => {
@@ -269,5 +242,25 @@ export async function getDashboardStats() {
     topSector,
     maturityDistribution,
     criteriaAverages,
+  };
+}
+
+export async function getBackupSnapshot() {
+  const admins = await prisma.adminUser.findMany({ orderBy: { createdAt: 'asc' } });
+  const submissions = (await prisma.submission.findMany({ orderBy: { submittedAt: 'desc' } })).map(
+    rowToRecord
+  );
+  return {
+    admins: admins.map((a) => ({
+      id: a.id,
+      email: a.email,
+      name: a.name,
+      role: a.role,
+      twoFactorEnabled: a.twoFactorEnabled,
+      passwordHash: a.passwordHash,
+      createdAt: a.createdAt.toISOString(),
+      updatedAt: a.updatedAt.toISOString(),
+    })),
+    submissions,
   };
 }

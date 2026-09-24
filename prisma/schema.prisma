@@ -38,6 +38,7 @@ model Submission {
   scorePercentage Int
   maturityLevel   String
   diagnosticJson  String   // Serialized JSON of diagnostic report
+  recordJson      String   // Serialized JSON of the full SubmissionRecord
   isAnonymized    Boolean  @default(false)
   submittedAt     DateTime @default(now())
   updatedAt       DateTime @updatedAt
